@@ -1,10 +1,12 @@
+[![Custom badge](https://img.shields.io/endpoint?url=https%3A%2F%2Fsolitary-king-440f.eng-msilva.workers.dev%2F)](https://hub.docker.com/r/gitlab/gitlab-ce)
+
 # Deploying GitLab CE on Kubernetes with Minikube
 
 <p align="center">
-<img src="./static/gitlab-kubernetes.png" width=50% height=50%>
+  <img src="./static/gitlab-kubernetes.png" width=50% height=50%>
 </p>
 
-This guide serves as a reference for setting up [GitLab CE v15.8.1](https://about.gitlab.com/install/ce-or-ee/) in a local Kubernetes development environment. In this guide, we’ll be using [minikube](https://minikube.sigs.k8s.io/). as it is the accepted standard.
+This guide serves as a reference for setting up [GitLab CE](https://hub.docker.com/r/gitlab/gitlab-ce) in a local Kubernetes development environment. In this guide, we’ll be using [minikube](https://minikube.sigs.k8s.io/) as it is the accepted standard.
 
 ## Local Development Environment Requirements
 
@@ -18,9 +20,9 @@ The development environment was built on a Linux distro based on **Ubuntu 18.04 
 
 ## Create Cluster
 
-After installing the `Docker`, `Minikube` and `Kubectl` applications, from a terminal with administrator access (but not logged in as root), run to create a cluster locally:
+For the implementation of this cluster, a CPU with 4 cores and 10 GB of RAM will be configured, according to the [recommended resources](https://docs.gitlab.com/ee/install/requirements.html#storage) for running GitLab.
 
-For the deployment of this cluster the [recommended settings](https://docs.gitlab.com/ee/install/requirements.html#storage) resources will be used. CPU with 4 cores and 10 GB of RAM.
+After installing the `Docker`, `Minikube` and `Kubectl` applications, from a terminal with administrator access (but not logged in as root), run to create a cluster locally:
 
 ```
 minikube start --cpus 4 --memory 10240
