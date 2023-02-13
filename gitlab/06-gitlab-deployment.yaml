@@ -1,0 +1,51 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: gitlab
+  namespace: gitlab
+  labels:
+    app: gitlab
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: gitlab
+  template:
+    metadata:
+      labels:
+        app: gitlab
+    spec:
+      containers:
+      - name: gitlab
+        image: gitlab/gitlab-ce:latest
+        env:
+        - name: GITLAB_OMNIBUS_CONFIG
+          value: >
+            external_url 'http://gitlab.local';
+            gitlab_rails['lfs_enabled'] = true;
+            gitlab_rails['gitlab_shell_ssh_port'] = 22;
+        ports:
+        - containerPort: 80
+          name: gitlab-http
+        - containerPort: 443
+          name: gitlab-https
+        - containerPort: 22
+          name: gitlab-ssh
+        volumeMounts:
+        - mountPath: /etc/gitlab
+          name: gitlab-config
+        - mountPath: /var/log/gitlab
+          name: gitlab-logs
+        - mountPath: /var/opt/gitlab
+          name: gitlab-config
+      volumes:
+        - name: gitlab-config
+          persistentVolumeClaim:
+            claimName: gitlab-claim0
+        - name: gitlab-logs
+          persistentVolumeClaim:
+            claimName: gitlab-claim1
+        - name: gitlab-data
+          persistentVolumeClaim:
+            claimName: gitlab-claim2
+      restartPolicy: Always

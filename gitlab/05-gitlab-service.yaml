@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gitlab
+  namespace: gitlab
+  labels:
+    app: gitlab
+spec:
+  selector:
+    app: gitlab
+  ports:
+  - name: 80-http
+    protocol: TCP
+    port: 80
+    targetPort: 80
+  - name: 443-https
+    protocol: TCP
+    port: 443
+    targetPort: 443
+  - name: 22-ssh
+    port: 22
+    protocol: TCP
+    targetPort: 22
+  externalTrafficPolicy: Local
+  type: LoadBalancer
