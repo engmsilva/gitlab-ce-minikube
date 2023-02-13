@@ -154,7 +154,7 @@ Click the SSH Keys link and paste the copied value into the text field.
 
 Set an expiration date, and then click the blue button to persistently add the GitLab SSH key.
 
-![alt text](./static/gitlab-ssh-key-conf.jpg)
+![alt text](./static/gitlab-ssh-key-conf.png)
 
 
 
