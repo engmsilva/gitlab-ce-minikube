@@ -87,7 +87,7 @@ Access the `Pod` shell:
 kubectl exec --stdin --tty gitlab-5cf5f7bc4f-ztns5 -n gitlab -- /bin/bash
 ```
 
-In the `Pod' shell run the command:
+In the `Pod` shell run the command:
 
 ```
 grep 'Password:' /etc/gitlab/initial_root_password
@@ -134,7 +134,7 @@ For 2048-bit RSA:
 ssh-keygen -t rsa -b 2048 -C "<comment>"
 ```
 
-A public key and a private key will be created. See the [GitLab documentation](https://docs.gitlab.com/ee/user/ssh.html) for more SSH key configuration options.
+A public key and a private key will be created. See the GitLab documentation for more [SSH key configuration options](https://docs.gitlab.com/ee/user/ssh.html) .
 
 ### Configure SSH key in GitLab User Preferences
 
