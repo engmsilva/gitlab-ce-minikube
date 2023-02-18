@@ -97,7 +97,92 @@ grep 'Password:' /etc/gitlab/initial_root_password
 
 **note:** The password file will be automatically deleted in the first reconfigure run after 24 hours.
 
+
+## Locally-trusted Development Certificates
+
+
+> **Warning**: The certificate configuration must be done before executing the **SSH** settings to avoid errors in the activation and deactivation steps of the **ingress addon**. When disabling and enabling the **ingress addon** after configuring **SSH**, the following error occurs:
+
+```
+minikube addons disable ingress
+❌  Exiting due to IF_SSH_AUTH: run callbacks: running callbacks: [NewSession: new client: new client: ssh: handshake failed: ssh: unable to authenticate, attempted methods [none publickey], no supported methods remain]
+💡  Suggestion: Your host is failing to route packets to the minikube VM. If you have VPN software, try turning it off or configuring it so that it does not re-route traffic to the VM IP. If not, check your VM environment routing options.
+📘  Documentation: https://minikube.sigs.k8s.io/docs/handbook/vpn_and_proxy/
+🍿  Related issue: https://github.com/kubernetes/minikube/issues/3930
+```
+
+
+To automatically create and install a local CA at the system root and generate locally trusted certificates, [mkcert](https://github.com/FiloSottile/mkcert) will be used.
+
+mkcert installation:
+
+```
+mkdir cert
+cd cert
+curl -JLO "https://dl.filippo.io/mkcert/latest?for=linux/amd64"
+chmod +x mkcert-v*-linux-amd64
+sudo cp mkcert-v*-linux-amd64 /usr/local/bin/mkcert
+```
+
+Generate local certificate:
+
+```
+mkcert -install
+```
+
+The certificate will be saved in the path **/home/user/.local/share/mkcert**. The path can also be seen by running the command:
+
+```
+mkcert -CAROOT
+```
+
+> **Warning**: the `rootCA-key.pem` file that mkcert automatically generates gives complete power to intercept secure requests from your machine. Do not share it.
+
+Generate local development trust certificates:
+
+```
+mkcert gitlab.local "*.gitlab.local"
+```
+
+Create TLS secret which contains custom certificate and private key:
+
+```
+kubectl -n kube-system create secret tls mkcert --key gitlab.local+1-key.pem --cert gitlab.local+1.pem
+```
+
+Configure ingress addon:
+
+```
+minikube addons configure ingress
+-- Enter custom cert(format is "namespace/secret"): kube-system/mkcert
+```
+
+Enable ingress addon (disable first when already enabled):
+
+```
+minikube addons disable ingress
+minikube addons enable ingress
+```
+
+Verify if custom certificate was enabled:
+
+```
+kubectl -n ingress-nginx get deployment ingress-nginx-controller -o yaml | grep "kube-system"
+```
+
+Apply patch on **gitlab deployment** for GitLab to listen behind a reverse proxy with https:
+
+```
+kubectl patch deployment gitlab --patch "$(cat ./patch/https-patch.yaml)" -n gitlab
+```
+
+Go to [https://gitlab.local](https://gitlab.local) and the browser should recognize the local domain as secure.
+
+![alt text](./static/gitlab_https.png)
+
+
 ## Cloned Repository via SSH
+
 The 3 steps that need to be followed in order to be able to clone GitLab repositories:
 
 - Configure the Ingress Controller to access GitLab via SSH;
@@ -117,7 +202,7 @@ kubectl patch configmap tcp-services -n ingress-nginx --patch '{"data":{"22":"gi
 Apply the patch on the nginx controller so that it listens on port 22:
 
 ```
-kubectl patch deployment ingress-nginx-controller --patch "$(cat ./ingress-nginx/controller-patch.yaml)" -n ingress-nginx
+kubectl patch deployment ingress-nginx-controller --patch "$(cat ./patch/controller-patch.yaml)" -n ingress-nginx
 ```
 
 ### Generate an SSH key pair
@@ -155,6 +240,3 @@ Click the SSH Keys link and paste the copied value into the text field.
 Set an expiration date, and then click the blue button to persistently add the GitLab SSH key.
 
 ![alt text](./static/gitlab-ssh-key-conf.png)
-
-
-

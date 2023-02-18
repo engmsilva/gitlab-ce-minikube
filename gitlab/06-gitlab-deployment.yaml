@@ -24,20 +24,21 @@ spec:
             external_url 'http://gitlab.local';
             gitlab_rails['lfs_enabled'] = true;
             gitlab_rails['gitlab_shell_ssh_port'] = 22;
+            gitlab_rails['time_zone'] = 'Brazil/East';
         ports:
         - containerPort: 80
-          name: gitlab-http
+          name: 80-http
         - containerPort: 443
-          name: gitlab-https
+          name: 443-https
         - containerPort: 22
-          name: gitlab-ssh
+          name: 22-ssh
         volumeMounts:
         - mountPath: /etc/gitlab
           name: gitlab-config
         - mountPath: /var/log/gitlab
           name: gitlab-logs
         - mountPath: /var/opt/gitlab
-          name: gitlab-config
+          name: gitlab-data
       volumes:
         - name: gitlab-config
           persistentVolumeClaim:

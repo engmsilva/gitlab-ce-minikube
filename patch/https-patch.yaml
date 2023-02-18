@@ -1,0 +1,15 @@
+spec:
+  template:
+    spec:
+      containers:
+      - name: gitlab
+        env:
+        - name: GITLAB_OMNIBUS_CONFIG
+          value: >
+            external_url 'https://gitlab.local';
+            nginx['listen_port'] = 80;
+            nginx['listen_https'] = false;
+            letsencrypt['enable'] = false;
+            gitlab_rails['lfs_enabled'] = true;
+            gitlab_rails['gitlab_shell_ssh_port'] = 22;
+            gitlab_rails['time_zone'] = 'Brazil/East';
