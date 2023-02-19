@@ -202,7 +202,7 @@ kubectl patch configmap tcp-services -n ingress-nginx --patch '{"data":{"22":"gi
 Apply the patch on the nginx controller so that it listens on port 22:
 
 ```
-kubectl patch deployment ingress-nginx-controller --patch "$(cat ./patch/controller-patch.yaml)" -n ingress-nginx
+kubectl patch deployment ingress-nginx-controller --patch "$(cat ./patch/ssh-controller-patch.yaml)" -n ingress-nginx
 ```
 
 ### Generate an SSH key pair
@@ -240,3 +240,59 @@ Click the SSH Keys link and paste the copied value into the text field.
 Set an expiration date, and then click the blue button to persistently add the GitLab SSH key.
 
 ![alt text](./static/gitlab-ssh-key-conf.png)
+
+## Gitlab Registry
+
+With the [GitLab Container Registry](https://docs.gitlab.com/ee/user/packages/container_registry/), every project can have its own space to store Docker images.
+
+To enable Container Registry on your GitLab instance perform the following steps.
+
+Configure the Ingress TCP service to listen on **GitLab Registry** port **5005**:
+
+
+```
+kubectl patch configmap tcp-services -n ingress-nginx --patch '{"data":{"5005":"gitlab/gitlab:5005"}}'
+```
+
+Apply the patch on the nginx controller so that it listens on port **5005**:
+
+```
+kubectl patch deployment ingress-nginx-controller --patch "$(cat ./patch/registry-controller-patch.yaml)" -n ingress-nginx
+```
+
+Apply patch on **gitlab deployment** to enable and configure GitLab Registry:
+
+```
+kubectl patch deployment gitlab --patch "$(cat ./patch/registry-deployment-patch.yaml)" -n gitlab
+```
+See the [GitLab Container Registry](https://docs.gitlab.com/ee/user/packages/container_registry/) documentation to learn how to access your project's registry.
+
+### Docker Image Upload to GitLab Registry
+
+For this example, the **app-hello-world** project located inside the examples directory will be used.
+
+Before starting, a [group](https://docs.gitlab.com/ee/user/group/) and a [project](https://docs.gitlab.com/ee/) have already been created ) in this group. For this example, the group **group-hello-world** and the project **project-hello-world** were created.
+
+Generate a docker image from the **app-hello-world** project's Dockerfile:
+
+```
+docker build -t registry.gitlab.local/group-hello-world/project-hello-world/app-hello-world ./examples/app-hello-world
+```
+
+Log in to GitLab Registry:
+
+```
+docker login registry.gitlab.local
+```
+
+Upload the image to the GitLab Registry:
+
+```
+docker push registry.gitlab.local/group-hello-world/project-hello-world/app-hello-world
+```
+Access the Container Registry of the **project-hello-world** project to view the uploaded image.
+
+![alt text](./static/gitlab-registry.png)
+
+
+

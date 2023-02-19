@@ -1,2 +1,3 @@
 *.pem
 /cert
+/node_modules

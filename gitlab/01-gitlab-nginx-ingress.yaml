@@ -3,6 +3,8 @@ kind: Ingress
 metadata:
   name: gitlab-ingress
   namespace: gitlab
+  annotations:
+    nginx.ingress.kubernetes.io/proxy-body-size: "0"
 spec:
   rules:
     - host: gitlab.local # change to the same domain that the external dns server is resolving to the external Ingress IP.
@@ -15,3 +17,13 @@ spec:
                 name: gitlab
                 port:
                   number: 80
+    - host: registry.gitlab.local
+      http:
+        paths:
+        - path: /
+          pathType: Prefix
+          backend:
+            service:
+              name: gitlab
+              port:
+                number: 5005

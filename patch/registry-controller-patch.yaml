@@ -1,0 +1,8 @@
+spec:
+  template:
+    spec:
+      containers:
+      - name: controller
+        ports:
+        - containerPort: 5005
+          hostPort: 5005

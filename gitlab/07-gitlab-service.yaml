@@ -13,13 +13,13 @@ spec:
     protocol: TCP
     port: 80
     targetPort: 80
-  - name: 443-https
-    protocol: TCP
-    port: 443
-    targetPort: 443
   - name: 22-ssh
     port: 22
     protocol: TCP
     targetPort: 22
+  - name: 5005-registry
+    port: 5005
+    protocol: TCP
+    targetPort: 5005
   externalTrafficPolicy: Local
   type: LoadBalancer

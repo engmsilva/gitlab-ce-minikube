@@ -28,8 +28,6 @@ spec:
         ports:
         - containerPort: 80
           name: 80-http
-        - containerPort: 443
-          name: 443-https
         - containerPort: 22
           name: 22-ssh
         volumeMounts:
