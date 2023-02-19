@@ -271,7 +271,7 @@ See the [GitLab Container Registry](https://docs.gitlab.com/ee/user/packages/con
 
 For this example, the **app-hello-world** project located inside the examples directory will be used.
 
-Before starting, a [group](https://docs.gitlab.com/ee/user/group/) and a [project](https://docs.gitlab.com/ee/) have already been created ) in this group. For this example, the group **group-hello-world** and the project **project-hello-world** were created.
+Before starting, a [group](https://docs.gitlab.com/ee/user/group/) and a [project](https://docs.gitlab.com/ee/) have already been created in this group. For this example, the group **group-hello-world** and the project **project-hello-world** were created.
 
 Generate a docker image from the **app-hello-world** project's Dockerfile:
 
