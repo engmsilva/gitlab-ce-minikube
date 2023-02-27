@@ -12,11 +12,11 @@ This guide serves as a reference for setting up [GitLab CE](https://hub.docker.c
 
 To deploy the k8s manifest files from this repository in the local development environment, it is necessary to install the following applications:
 
-- [Docker v20.10.14](https://docs.docker.com/engine/install/ubuntu/)
+- [Docker v23.0.1](https://docs.docker.com/engine/install/ubuntu/)
 - [Minikube v1.29.0](https://minikube.sigs.k8s.io/docs/start/#:~:text=1-,Installation,-Click%20on%20the)
-- [Kubectl v1.26.0](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
+- [Kubectl v1.26.1](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
 
-The development environment was built on a Linux distro based on **Ubuntu 18.04 LTS**.
+The development environment was built on a Linux distro based on **22.04.2 LTS (Jammy Jellyfish)**.
 
 ## Create Cluster
 
@@ -41,6 +41,7 @@ git clone https://github.com/engmsilva/gitlab-ce-minikube.git
 ```
 
 Run the deployment on the cluster:
+> **Notice**: I recommend running [the local certificate setup steps](#locally-trusted-development-certificates) before deploying from GitLab if using https.
 
 ```
 cd gitlab-ce-minikube
@@ -74,7 +75,7 @@ Add the IP from the **ADDRESS** column in the `/etc/hosts` file to resolve name 
 Restart the networking service:
 
 ```
-sudo service network-manager restart
+sudo systemctl restart NetworkManager.service
 ```
 
 ## Login
@@ -164,6 +165,24 @@ minikube addons disable ingress
 minikube addons enable ingress
 ```
 
+Update localhost certificates:
+
+```
+sudo update-ca-certificates
+```
+
+Restart `Docker` to load certificates from localhost:
+
+```
+sudo systemctl restart docker
+```
+
+After restarting `Docker` it is necessary to start the `minikube` cluster container again:
+
+```
+minikube start -p minikube
+```
+
 Verify if custom certificate was enabled:
 
 ```
@@ -173,7 +192,7 @@ kubectl -n ingress-nginx get deployment ingress-nginx-controller -o yaml | grep 
 Apply patch on **gitlab deployment** for GitLab to listen behind a reverse proxy with https:
 
 ```
-kubectl patch deployment gitlab --patch "$(cat ./patch/https-patch.yaml)" -n gitlab
+kubectl patch deployment gitlab --patch "$(cat ./patch/00-https-patch.yaml)" -n gitlab
 ```
 
 Go to [https://gitlab.local](https://gitlab.local) and the browser should recognize the local domain as secure.
@@ -202,7 +221,7 @@ kubectl patch configmap tcp-services -n ingress-nginx --patch '{"data":{"22":"gi
 Apply the patch on the nginx controller so that it listens on port 22:
 
 ```
-kubectl patch deployment ingress-nginx-controller --patch "$(cat ./patch/ssh-controller-patch.yaml)" -n ingress-nginx
+kubectl patch deployment ingress-nginx-controller --patch "$(cat ./patch/01-ssh-controller-patch.yaml)" -n ingress-nginx
 ```
 
 ### Generate an SSH key pair
@@ -257,13 +276,13 @@ kubectl patch configmap tcp-services -n ingress-nginx --patch '{"data":{"5005":"
 Apply the patch on the nginx controller so that it listens on port **5005**:
 
 ```
-kubectl patch deployment ingress-nginx-controller --patch "$(cat ./patch/registry-controller-patch.yaml)" -n ingress-nginx
+kubectl patch deployment ingress-nginx-controller --patch "$(cat ./patch/02-registry-controller-patch.yaml)" -n ingress-nginx
 ```
 
 Apply patch on **gitlab deployment** to enable and configure GitLab Registry:
 
 ```
-kubectl patch deployment gitlab --patch "$(cat ./patch/registry-deployment-patch.yaml)" -n gitlab
+kubectl patch deployment gitlab --patch "$(cat ./patch/03-registry-deployment-patch.yaml)" -n gitlab
 ```
 See the [GitLab Container Registry](https://docs.gitlab.com/ee/user/packages/container_registry/) documentation to learn how to access your project's registry.
 
