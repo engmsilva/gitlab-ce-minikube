@@ -16,7 +16,7 @@ To deploy the k8s manifest files from this repository in the local development e
 - [Minikube v1.29.0](https://minikube.sigs.k8s.io/docs/start/#:~:text=1-,Installation,-Click%20on%20the)
 - [Kubectl v1.26.1](https://kubernetes.io/docs/tasks/tools/install-kubectl-linux/)
 
-The development environment was built on a Linux distro based on **22.04.2 LTS (Jammy Jellyfish)**.
+The proposed development environment was configured and tested on **Ubuntu 22.04.2 LTS (Jammy Jellyfish)**.
 
 ## Create Cluster
 
